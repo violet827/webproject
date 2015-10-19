@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.familykitchen.mapper.UserAddressMapper">
+	
+	<!-- 新增地址 -->
+	<insert id="addUserAddress" parameterType="useraddressvo">
+		insert into tb_user_address(
+		pk_user,
+		prov,
+		city,
+		town,
+		street,
+		detailaddress,
+		postcode,
+		getusername,
+		getusertel,
+		kitchenflag,
+		defaultflag
+		) 
+		values(
+		#{pk_user.pk_user},
+		#{prov},
+		#{city},
+		#{town},
+		#{street},
+		#{detailaddress},
+		#{postcode},
+		#{getusername},
+		#{getusertel},
+		#{kitchenflag},
+		#{defaultflag}
+		)
+	</insert>
+	
+	<!-- 更新地址  -->
+	<update id="updateUserAddress" parameterType="useraddressvo">
+		update tb_user_address set 
+		prov=#{prov}, 
+		city=#{city}, 
+		town=#{town},
+		street=#{street}, 
+		detailaddress=#{detailaddress}, 
+		postcode=#{postcode},
+		getusername=#{getusername}, 
+		getusertel=#{getusertel},
+		kitchenflag=#{kitchenflag}, 
+		defaultflag=#{defaultflag}
+		where pk_address=#{pk_address} and pk_user=#{pk_user.pk_user}
+	</update>
+		
+	<!-- 删除地址  -->
+	<delete id="deleteUserAddress" parameterType="int">
+		delete from tb_user_address where pk_address=#{pk_address}
+	</delete>
+	
+	<!-- 查询指定地址  -->
+	<select id="getAddressByID" parameterType="int" resultMap="resultListUserAddress">
+        select 
+		ua.pk_address,
+		ua.pk_user,
+		u.name as username,
+		u.telphone,
+		ua.prov,
+		ua.city,
+		ua.town,
+		ua.street,
+		ua.detailaddress,
+		ua.postcode,
+		ua.getusername,
+		ua.getusertel,
+		ua.kitchenflag,
+		ua.defaultflag
+		from tb_user_address as ua left join tb_user as u on ua.pk_user = u.pk_user
+		where ua.pk_address=#{pk_address}
+	</select>
+	
+	<!-- 获取用户默认地址  -->
+	<select id="getUserDefaultAddressByID" parameterType="int" resultMap="resultListUserAddress">
+        select 
+		ua.pk_address,
+		ua.pk_user,
+		u.name as username,
+		u.telphone,
+		ua.prov,
+		ua.city,
+		ua.town,
+		ua.street,
+		ua.detailaddress,
+		ua.postcode,
+		ua.getusername,
+		ua.getusertel,
+		ua.kitchenflag,
+		ua.defaultflag
+		from tb_user_address as ua left join tb_user as u on ua.pk_user = u.pk_user
+		where (ua.defaultflag = 'Y' or ua.defaultflag = '1') and ua.pk_user=#{pk_user}
+	</select>
+	
+		<!-- 获取用户厨房地址  -->
+	<select id="getUserKitchenAddressByID" parameterType="int" resultMap="resultListUserAddress">
+        select 
+		ua.pk_address,
+		ua.pk_user,
+		u.name as username,
+		u.telphone,
+		ua.prov,
+		ua.city,
+		ua.town,
+		ua.street,
+		ua.detailaddress,
+		ua.postcode,
+		ua.getusername,
+		ua.getusertel,
+		ua.kitchenflag,
+		ua.defaultflag
+		from tb_user_address as ua left join tb_user as u on ua.pk_user = u.pk_user
+		where (ua.kitchenflag = 'Y' or ua.kitchenflag = '1') and ua.pk_user=#{pk_user}
+	</select>
+	
+	<!-- 更新指定地址的默认标记  -->
+	<update id="updateAddressDefaultFlag" parameterType="java.util.Map">
+		update tb_user_address set 
+		defaultflag = #{defaultflag}
+		where pk_address=#{pk_address}
+	</update>
+	
+	<!-- 获取用户所有地址信息  -->
+ 	<select id="getAllUserAddressInfoByID" parameterType="int" resultMap="resultListUserAddress">
+        select 
+		ua.pk_address,
+		ua.pk_user,
+		u.name as username,
+		u.telphone,
+		ua.prov,
+		ua.city,
+		ua.town,
+		ua.street,
+		ua.detailaddress,
+		ua.postcode,
+		ua.getusername,
+		ua.getusertel,
+		ua.kitchenflag,
+		ua.defaultflag
+		from tb_user_address as ua left join tb_user as u on ua.pk_user = u.pk_user
+		where ua.pk_user = #{pk_user}
+    </select>
+    
+    <!-- 获取用户所有收货地址信息  -->
+ 	<select id="getAllUserReceiveAddressInfoByID" parameterType="int" resultMap="resultListUserAddress">
+        select 
+		ua.pk_address,
+		ua.pk_user,
+		u.name as username,
+		u.telphone,
+		ua.prov,
+		ua.city,
+		ua.town,
+		ua.street,
+		ua.detailaddress,
+		ua.postcode,
+		ua.getusername,
+		ua.getusertel,
+		ua.kitchenflag,
+		ua.defaultflag
+		from tb_user_address as ua left join tb_user as u on ua.pk_user = u.pk_user
+		where ua.pk_user = #{pk_user} and (kitchenflag is null or kitchenflag = 0) 
+    </select>
+    
+ 	<resultMap type="useraddressvo" id="resultListUserAddress">
+        <id column="pk_address" property="pk_address" />
+        <result column="prov" property="prov" />
+        <result column="city" property="city" />
+        <result column="town" property="town" />
+        <result column="street" property="street" />
+        <result column="detailaddress" property="detailaddress" />
+        <result column="postcode" property="postcode" />
+        <result column="getusername" property="getusername" />
+        <result column="getusertel" property="getusertel" />
+        <result column="kitchenflag" property="kitchenflag" javaType="Boolean" jdbcType="CHAR"/>
+        <result column="defaultflag" property="defaultflag" javaType="Boolean" jdbcType="CHAR"/>
+        <association property="pk_user" javaType="uservo">
+            <id property="pk_user" column="pk_user" />
+            <result property="name" column="username" />
+            <result property="telphone" column="telphone" />
+        </association>
+    </resultMap>
+    
+</mapper>

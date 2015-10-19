@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.familykitchen.mapper.VegetableMapper">
+	
+	<!-- 查询所有蔬菜列表  -->
+	<select id="getAllVegetableInfo" resultMap="resultListVegetable">
+		select 
+        v.pk_vegetable,
+		v.vname,
+		v.vimage,
+		v.amount,
+		v.pk_supplier,
+		vs.suppliername,
+		vs.supplierlocation,
+		v.price,
+		v.totalsalecount,
+		v.longitude,
+		v.latitude,
+		v.marketprice
+        from tb_vegetable as v left join tb_vegetable_supplier as vs on v.pk_supplier = vs.pk_vegetable_supplier
+	</select>
+	
+	<!-- 查询指定蔬菜信息 -->
+ 	<select id="getVegetableByID" parameterType="int" resultMap="resultListVegetable">
+        select 
+        v.pk_vegetable,
+		v.vname,
+		v.vimage,
+		v.amount,
+		v.pk_supplier,
+		vs.suppliername,
+		vs.supplierlocation,
+		v.price,
+		v.totalsalecount,
+		v.longitude,
+		v.latitude,
+		v.marketprice
+        from tb_vegetable as v left join tb_vegetable_supplier as vs on v.pk_supplier = vs.pk_vegetable_supplier
+        where v.pk_vegetable = #{pk_vegetable}
+    </select>
+    
+    <!-- 更新蔬菜数量  -->
+	<update id="updateVegetableCount" parameterType="java.util.Map">
+		update tb_vegetable set amount = amount - #{vegetablecount} where pk_vegetable = #{pk_vegetable}
+	</update>
+	
+	<!-- 更新蔬菜销量  -->
+	<update id="updateVegetableTotalSaleCount" parameterType="java.util.Map">
+		update tb_vegetable set totalsalecount = totalsalecount + #{salecount} where pk_vegetable = #{pk_vegetable}
+	</update>
+	
+ 	<resultMap type="vegetablevo" id="resultListVegetable">
+        <id column="pk_vegetable" property="pk_vegetable" />
+        <result column="vname" property="vname" />
+        <result column="vimage" property="vimage" />
+        <result column="amount" property="amount" />
+        <result column="price" property="price" />
+        <result column="totalsalecount" property="totalsalecount" />
+        <result column="longitude" property="longitude" />
+        <result column="latitude" property="latitude" />
+        <result column="marketprice" property="marketprice" />
+        
+        <association property="pk_supplier" javaType="vegetablesuppliervo">
+            <id property="pk_vegetable_supplier" column="pk_supplier" />
+            <result property="suppliername" column="suppliername" />
+            <result property="supplierlocation" column="supplierlocation" />
+        </association>
+    </resultMap>
+    
+</mapper>

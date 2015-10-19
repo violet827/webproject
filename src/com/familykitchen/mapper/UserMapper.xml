@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.familykitchen.mapper.UserMapper">
+	
+	<!-- 保存用户  -->
+	<insert id="addUser" parameterType="uservo">
+		insert into tb_user(
+		name,
+		password,
+		telphone,
+		birthday,
+		intro) 
+		
+		values(
+		#{name},
+		#{password},
+		#{telphone},
+		#{birthday},
+		#{intro}
+		)
+	</insert>
+	
+	<!-- 修改用户密码  -->
+	<update id="updateUserPwd" parameterType="uservo">
+		update tb_user set password=#{password} where pk_user=#{pk_user}
+	</update>
+	
+	<!-- 根据手机号和密码查找用户  -->
+	<select id="getUserByTelAndPwd" parameterType="java.util.Map" resultMap="resultListUser">
+		select 
+		pk_user,
+		name,
+		password,
+		telphone,
+		birthday,
+		intro
+		from tb_user
+		where telphone=#{telphone} and password=#{password} LIMIT 1
+	</select>
+	
+	<!-- 查询指定手机号码用户个数  -->
+	<select id="getUserByTelphone" parameterType="String" resultType="int">
+		select count(*) from tb_user where telphone=#{telphone}
+	</select>
+	
+	<!-- 删除用户  -->
+	<delete id="deleteUser" parameterType="int">
+		delete from tb_user where pk_user=#{pk_user}
+	</delete>
+	
+	<!-- 根据用户ID查询用户  -->
+ 	<select id="getUserVOByID" parameterType="int" resultMap="resultListUser">
+        select 
+		pk_user,
+		name,
+		password,
+		telphone,
+		birthday,
+		intro
+		from tb_user
+		where pk_user = #{pk_user}
+    </select>
+    
+	<resultMap type="uservo" id="resultListUser">
+        <id column="pk_user" property="pk_user" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="telphone" property="telphone" />
+        <result column="birthday" property="birthday" />
+        <result column="intro" property="intro" />
+    </resultMap>
+</mapper>

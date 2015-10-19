@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.familykitchen.mapper.DishMapper">
+	
+	<!-- 新增菜品  dishname/pk_user/dishcount/unitprice为必输项-->
+	<insert id="addDishBaseInfo" parameterType="dishvo">
+		insert into tb_dish(
+		dishname,
+		dishintro,
+		pk_dishtastetype,
+		pk_user,
+		cookingtime,
+		dishcount,
+		getmode,
+		unitprice,
+		offprice,
+		cookfinishtime,
+		orderendtime,
+		previewimagedir,
+		dishstatus,
+		publishdate,
+		totalsalecount,
+		likecount,
+		kitchenaddress,
+		longitude,
+		latitude,
+		marketprice
+		) 
+		
+		values(
+		#{dishname},
+		#{dishintro},
+		#{pk_dishtastetype},
+		#{pk_user.pk_user},
+		#{cookingtime},
+		#{dishcount},
+		#{getmode},
+		#{unitprice},
+		#{offprice},
+		#{cookfinishtime},
+		#{orderendtime},
+		#{previewimagedir},
+		#{dishstatus},
+		#{publishdate},
+		#{totalsalecount},
+		#{likecount},
+		#{kitchenaddress},
+		#{longitude},
+		#{latitude},
+		#{marketprice}
+		)
+	</insert>
+	
+	
+	<!-- 更新菜品信息  -->
+	<update id="updateDishBaseInfo" parameterType="dishvo">
+		update tb_dish set 
+		dishname=#{dishname},
+		dishintro=#{dishintro},
+		pk_dishtastetype=#{pk_dishtastetype},
+		pk_user=#{pk_user.pk_user},
+		cookingtime=#{cookingtime},
+		dishcount=#{dishcount},
+		getmode=#{getmode},
+		unitprice=#{unitprice},
+		offprice=#{offprice},
+		cookfinishtime=#{cookfinishtime},
+		orderendtime=#{orderendtime},
+		previewimagedir=#{previewimagedir},
+		dishstatus=#{dishstatus},
+		publishdate=#{publishdate},
+		totalsalecount=#{totalsalecount},
+		likecount=#{likecount},
+		kitchenaddress=#{kitchenaddress},
+		longitude=#{longitude},
+		latitude=#{latitude},
+		marketprice=#{marketprice}
+		where pk_dish=#{pk_dish}
+	</update>
+	
+	<!-- 发布菜品信息  -->
+	<update id="publishDish" parameterType="java.util.Map">
+		update tb_dish set dishstatus=#{dishstatus} 
+		where pk_dish=#{pk_dish}
+	</update>
+	
+	<!-- 更新菜品状态  -->
+	<update id="updateDishStatus" parameterType="java.util.Map">
+		update tb_dish set dishstatus=#{dishstatus} where pk_dish=#{pk_dish}
+	</update>
+	
+	<!-- 更新菜品数量  -->
+	<update id="updateDishCount" parameterType="java.util.Map">
+		update tb_dish set dishcount = dishcount-#{dishcount} where pk_dish=#{pk_dish}
+	</update>
+	
+	<!-- 更新菜品销量  -->
+	<update id="updateDishTotalSaleCount" parameterType="java.util.Map">
+		update tb_dish set totalsalecount = totalsalecount+#{salecount} where pk_dish=#{pk_dish}
+	</update>
+	
+	<!-- 更新菜品点赞量  -->
+	<update id="updateDishLikeCount" parameterType="int">
+		update tb_dish set likecount = likecount+1 where pk_dish=#{pk_dish}
+	</update>
+	
+	<!-- 删除菜品  -->
+	<delete id="deleteDish" parameterType="int">
+		delete from tb_dish where pk_dish=#{pk_dish}
+	</delete>
+	
+	<!-- 根据菜品ID查询菜品  -->
+ 	<select id="getDishVOByID" parameterType="int" resultMap="resultListDish">
+        select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+		where pk_dish = #{pk_dish}
+    </select>
+    
+	
+	<!-- 排序查询今天已审核的所有菜品  -->
+ 	<select id="getTodayApprovedDishListByOrder" parameterType="java.util.Map" resultMap="resultListDish">
+        select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+        where dishstatus = 2 and FIND_IN_SET(left(now(), 10), publishdate) > 0
+        order by ${sort} ${dir} 
+    </select>
+    
+	<!-- 排序查询明天已审核的所有菜品  -->
+ 	<select id="getTomorrowApprovedDishListByOrder" parameterType="java.util.Map" resultMap="resultListDish">
+        select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+        where dishstatus = 2 and FIND_IN_SET(left(DATE_ADD(NOW(),INTERVAL 1 DAY), 10), publishdate) > 0
+        order by ${sort} ${dir} 
+    </select>
+    
+    <!-- 查询指定用户增加的所有菜品  -->
+ 	<select id="getAllDishBaseInfoByID" parameterType="int" resultMap="resultListDish">
+        select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+		where d.pk_user = #{pk_user}
+    </select>
+    
+    <!-- 查询指定用户今日所有已审核的菜品  -->
+ 	<select id="getAllTodayApproveDishVOsByID" parameterType="int" resultMap="resultListDish">
+        select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+		where d.pk_user = #{pk_user} and d.dishstatus = 2 and DATEDIFF(publishdate ,now()) = 0 
+    </select>
+    
+     <!-- 查询指定用户今日所有已发布的菜品  -->
+ 	<select id="getAllTodayPublishDishVOsByID" parameterType="int" resultMap="resultListDish">
+        select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+		where d.pk_user = #{pk_user} and (d.dishstatus = 1 or d.dishstatus = 2) and DATEDIFF(publishdate ,now()) = 0 
+    </select>
+    
+    <!-- 根据条件查询菜品  -->
+	<select id="getDishByCondition" parameterType="java.util.Map"  resultMap="resultListDish">
+		select
+		d.pk_dish,
+		d.dishname,
+		d.dishintro,
+		d.pk_dishtastetype,
+		d.pk_user,
+		u.name as username,
+		u.telphone,
+		d.cookingtime,
+		d.dishcount,
+		d.getmode,
+		d.unitprice,
+		d.offprice,
+		d.cookfinishtime,
+		d.orderendtime,
+		d.previewimagedir,
+		d.dishstatus,
+		d.publishdate,
+		d.totalsalecount,
+		d.likecount,
+		d.kitchenaddress,
+		d.longitude,
+		d.latitude,
+		d.marketprice
+		from tb_dish as d left join tb_user as u on d.pk_user = u.pk_user
+		where ${condition}
+		order by d.publishdate desc
+	</select>
+	
+    <resultMap type="dishvo" id="resultListDish">
+        <id column="pk_dish" property="pk_dish" />
+        <result column="dishname" property="dishname" />
+        <result column="dishintro" property="dishintro" />
+        <result column="cookingtime" property="cookingtime" />
+        <result column="dishcount" property="dishcount" />
+        <result column="getmode" property="getmode" />
+        <result column="unitprice" property="unitprice" />
+        <result column="offprice" property="offprice" />
+        <result column="cookfinishtime" property="cookfinishtime" />
+        <result column="orderendtime" property="orderendtime" />
+        <result column="previewimagedir" property="previewimagedir" />
+        <result column="dishstatus" property="dishstatus" />
+        <result column="publishdate" property="publishdate" />
+        <result column="totalsalecount" property="totalsalecount" />
+        <result column="likecount" property="likecount" />
+        <result column="kitchenaddress" property="kitchenaddress" />
+        <result column="pk_dishtastetype" property="pk_dishtastetype" />
+        <result column="longitude" property="longitude" />
+        <result column="latitude" property="latitude" />
+		<result column="marketprice" property="marketprice" />
+
+        <association property="pk_user" javaType="uservo">
+            <id property="pk_user" column="pk_user" />
+            <result property="name" column="username" />
+            <result property="telphone" column="telphone" />
+        </association>
+    </resultMap>
+    
+</mapper>

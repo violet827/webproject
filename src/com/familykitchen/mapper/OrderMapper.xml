@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.familykitchen.mapper.OrderMapper">
+	
+	<!-- 新增订单，返回订单主键  -->
+	<insert id="addOrder" parameterType="ordervo">
+		insert into tb_order(
+			orderdate,
+			ordertype,
+			pk_dish,
+			pk_vegetable,
+			pk_orderuser,
+			pk_saler,
+			receiveaddress,
+			telphone,
+			dealstatus,
+			ordercount,
+			totalprice,
+			saledprice,
+			paystatus,
+			paytype,
+			getmode,
+			kitchenaddress,
+			ordermemo,
+			salertelphone,
+			buyerdeleteflag,
+			salerdeleteflag,
+			balanceflag,
+			imagedir,
+			orderguid,
+			marketprice) 
+		values(
+			#{orderdate},
+			#{ordertype},
+			#{pk_dish.pk_dish},
+			#{pk_vegetable.pk_vegetable},
+			#{pk_orderuser.pk_user},
+			#{pk_saler.pk_user},
+			#{receiveaddress},
+			#{telphone},
+			#{dealstatus},
+			#{ordercount},
+			#{totalprice},
+			#{saledprice},
+			#{paystatus},
+			#{paytype},
+			#{getmode},
+			#{kitchenaddress},
+			#{ordermemo},
+			#{salertelphone},
+			#{buyerdeleteflag},
+			#{salerdeleteflag},
+			#{balanceflag},
+			#{imagedir},
+			#{orderguid},
+			#{marketprice}
+		)		
+	</insert>
+	
+	<!-- 更新订单处理状态  -->
+	<update id="updateOrderDealStatus" parameterType="java.util.Map">
+		update tb_order set dealstatus = #{dealstatus} where pk_order=#{pk_order}
+	</update>
+	
+	<!-- 买家删除，更新订单处理状态  -->
+	<update id="updateOrderBuyerDeleteFlag" parameterType="int">
+		update tb_order set buyerdeleteflag = 1 where pk_order=#{pk_order}
+	</update>
+	
+	<!-- 卖家删除，更新订单处理状态  -->
+	<update id="updateOrderSalerDeleteFlag" parameterType="int">
+		update tb_order set salerdeleteflag = 1 where pk_order=#{pk_order}
+	</update>
+	
+	<!-- 更新订单结算状态  -->
+	<update id="updateOrderBalanceFlag" parameterType="int">
+		update tb_order set balanceflag = 1 where pk_order=#{pk_order}
+	</update>
+	
+	<!-- 更新订单支付状态  -->
+	<update id="updaeOrderPayStatus" parameterType="java.util.Map">
+		update tb_order set paystatus = #{paystatus} where pk_order=#{pk_order}
+	</update>
+	
+	<!-- 查找买方订单  -->
+	<select id="getAllOrderByID" parameterType="int" resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.pk_orderuser = #{pk_orderuser}
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 查找卖方订单  -->
+	<select id="getAllOrderBySalerID" parameterType="int" resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where pk_saler = #{pk_saler}
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 删除订单  -->
+	<delete id="deleteDishOrderByID" parameterType="int">
+		delete from tb_order where pk_order = #{pk_order}
+	</delete>
+	
+	
+	<!-- 查询所有订单中指定菜品出现次数  -->
+	<select id="getAllOrderByDishID" parameterType="int" resultType="int">
+		select count(*) from tb_order where pk_dish = #{pk_dish}
+	</select>
+	
+	<!-- 根据订单ID查询订单VO  -->
+	<select id="getOrderVOByID" parameterType="int" resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where pk_order = #{pk_order}
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 查找所有已支付订单  -->
+	<select id="getAllPayedOrder"  resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.paystatus = 1
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 查找所有未支付订单  -->
+	<select id="getAllNoPayOrder" resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.paystatus = 0 or o.paystatus is NULL 
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 查找指定用户已支付订单  -->
+	<select id="getAllPayedOrderByUserID" parameterType="int"  resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.paystatus = 1 and o.pk_orderuser = #{pk_orderuser}
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 查找指定用户未支付订单  -->
+	<select id="getAllNoPayOrderByUserID" parameterType="int" resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.pk_orderuser = #{pk_orderuser} and (o.paystatus = 0 or o.paystatus is NULL) 
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 根据订单GUID查询订单ID  -->
+	<select id="getOrderIDByGUID" parameterType="String" resultType="int">
+		select pk_order from tb_order where orderguid = #{orderguid}
+	</select>
+	
+	<!-- 查找指定用户今日已支付订单  -->
+	<select id="getAllTodayPayedOrderByUserID" parameterType="int"  resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.paystatus = 1 and o.pk_orderuser = #{pk_orderuser} and DATEDIFF(o.orderdate ,now()) = 0 
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 查找指定用户今日之前已支付订单  -->
+	<select id="getAllBeforeTodayPayedOrderByUserID" parameterType="int"  resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where o.paystatus = 1 and o.pk_orderuser = #{pk_orderuser} and DATEDIFF(now(), o.orderdate) > 0
+		order by o.orderdate desc
+	</select>
+	
+	<!-- 根据条件查询订单  -->
+	<select id="getOrderByCondition" parameterType="java.util.Map"  resultMap="resultListOrder">
+		select 
+		o.pk_order,
+		o.orderdate,
+		o.ordertype,
+		o.pk_dish,
+		d.dishname,
+		d.previewimagedir,
+		o.pk_vegetable,
+		v.vname,
+		v.vimage,
+		o.pk_orderuser,
+		u1.name as orderusername,
+		u1.telphone as orderusertelphone,
+		o.pk_saler,
+		u2.name as salername,
+		u2.telphone as salertelphone,
+		o.receiveaddress,
+		o.telphone,
+		o.dealstatus,
+		o.ordercount,
+		o.totalprice,
+		o.saledprice,
+		o.paystatus,
+		o.paytype,
+		o.getmode,
+		o.kitchenaddress,
+		o.ordermemo,
+		o.salertelphone,
+		o.buyerdeleteflag,
+		o.salerdeleteflag,
+		o.balanceflag,
+		o.imagedir,
+		o.orderguid,
+		o.marketprice
+		from tb_order as o 
+		left join tb_dish as d on o.pk_dish = d.pk_dish
+		left join tb_vegetable as v on o.pk_vegetable = v.pk_vegetable
+		left join tb_user as u1 on o.pk_orderuser = u1.pk_user
+		left join tb_user as u2 on o.pk_saler = u2.pk_user
+		where ${condition}
+		order by o.orderdate desc
+	</select>
+	
+	
+	<resultMap type="ordervo" id="resultListOrder">
+        <id column="pk_order" property="pk_order" />
+        <result column="orderdate" property="orderdate" />
+        <result column="ordertype" property="ordertype" />
+        <result column="telphone" property="telphone" />
+        <result column="dealstatus" property="dealstatus" />
+        <result column="ordercount" property="ordercount" />
+        <result column="totalprice" property="totalprice" />
+        <result column="saledprice" property="saledprice" />
+        <result column="paystatus" property="paystatus" />
+        <result column="paytype" property="paytype" />
+        <result column="getmode" property="getmode" />
+        <result column="ordermemo" property="ordermemo" />
+        <result column="salertelphone" property="salertelphone" />
+        <result column="receiveaddress" property="receiveaddress" />
+        <result column="kitchenaddress" property="kitchenaddress" />
+        <result column="buyerdeleteflag" property="buyerdeleteflag" />
+        <result column="salerdeleteflag" property="salerdeleteflag" />
+        <result column="balanceflag" property="balanceflag" />
+        <result column="imagedir" property="imagedir" />
+        <result column="orderguid" property="orderguid" />
+        <result column="marketprice" property="marketprice" />
+        
+        <association property="pk_dish" javaType="dishvo">
+            <id property="pk_dish" column="pk_dish" />
+            <result property="dishname" column="dishname" />
+            <result property="previewimagedir" column="previewimagedir" />
+        </association>
+        <association property="pk_vegetable" javaType="vegetablevo">
+            <id property="pk_vegetable" column="pk_vegetable" />
+            <result property="vname" column="vname" />
+            <result property="vimage" column="vimage" />
+        </association>
+        <association property="pk_orderuser" javaType="uservo">
+            <id property="pk_user" column="pk_orderuser" />
+            <result property="name" column="orderusername" />
+            <result property="telphone" column="orderusertelphone" />
+        </association>
+        <association property="pk_saler" javaType="uservo">
+            <id property="pk_user" column="pk_saler" />
+            <result property="name" column="salername" />
+            <result property="telphone" column="salertelphone" />
+        </association>
+        
+    </resultMap>
+    
+</mapper>

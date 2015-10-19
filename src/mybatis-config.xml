@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- <properties resource="jdbc.properties" /> -->
+	<settings>
+		<!-- 全局启用或禁用延迟加载。当禁用时，所有关联对象都会即时加载。默认：true  -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 当启用时，有延迟加载属性的对象在被调用时将会完全加载任意属性。否则，每种属性将会按需要加载 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+
+	<typeAliases>
+		<typeAlias type="com.familykitchen.bean.UserVO" alias="uservo"/>
+		<typeAlias type="com.familykitchen.bean.UserAddressVO" alias="useraddressvo"/>
+		<typeAlias type="com.familykitchen.bean.DishVO" alias="dishvo"/>
+		<typeAlias type="com.familykitchen.bean.VegetableVO" alias="vegetablevo"/>
+		<typeAlias type="com.familykitchen.bean.VegetableSupplierVO" alias="vegetablesuppliervo"/>
+		<typeAlias type="com.familykitchen.bean.OrderVO" alias="ordervo"/>
+	</typeAliases>
+	
+	<typeHandlers>
+		<typeHandler javaType="Boolean" jdbcType="CHAR" handler="com.familykitchen.utils.BooleanTypeHandler" />
+	</typeHandlers>
+	
+	<environments default="development">
+    	<environment id="development">
+    		<transactionManager type="JDBC"/>
+			
+			<dataSource type="POOLED">
+		        <property name="driver" value="org.gjt.mm.mysql.Driver"/>
+		        <property name="url" value="jdbc:mysql://rdssau2ajcv8c5vxkhs1i.mysql.rds.aliyuncs.com:3306/cooking?useUnicode=true&amp;characterEncoding=UTF-8"/>
+		        <property name="username" value="tangxx1984"/>
+		        <property name="password" value="tangxx1984"/>
+	      	</dataSource>
+	      	
+			<!-- 
+			<dataSource type="POOLED">
+		        <property name="driver" value="org.gjt.mm.mysql.Driver"/>
+		        <property name="url" value="jdbc:mysql://127.0.0.1:3306/myapp0420?useUnicode=true&amp;characterEncoding=UTF-8"/>
+		        <property name="username" value="root"/>
+		        <property name="password" value="violet827"/>
+	      	</dataSource>
+	      	 -->
+	      	 
+	      	 <!-- 
+	      	<dataSource type="POOLED">
+		        <property name="driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+		        <property name="url" value="jdbc:sqlserver://20.10.80.128:1433;DatabaseName=uaptest"/>
+		        <property name="username" value="sa"/> 
+		        <property name="password" value="uapbd"/>
+		    </dataSource>
+		     -->
+    	</environment>
+    </environments>
+    
+	<mappers>
+		<mapper resource="com/familykitchen/mapper/UserMapper.xml"/>
+		<mapper resource="com/familykitchen/mapper/UserAddressMapper.xml"/>
+		<mapper resource="com/familykitchen/mapper/VegetableMapper.xml"/>
+		<mapper resource="com/familykitchen/mapper/DishMapper.xml"/>
+		<mapper resource="com/familykitchen/mapper/OrderMapper.xml"/>
+	</mappers>
+	
+</configuration>
